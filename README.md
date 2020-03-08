@@ -1,4 +1,7 @@
-# parse-link-header
+# parse_link_header
+
+[![Build Status](https://travis-ci.com/g1eny0ung/parse_link_header.svg?branch=master)](https://travis-ci.com/g1eny0ung/parse_link_header)
+![Crates.io](https://img.shields.io/crates/v/parse_link_header)
 
 A library for parse http link header.
 
