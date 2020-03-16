@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use regex::Regex;
 use url::Url;
 
-// Parse link header
+/// Parse link header.
 pub fn parse(link_header: &str) -> HashMap<String, HashMap<String, String>> {
     let mut result: HashMap<String, HashMap<String, String>> = HashMap::new();
     let re = Regex::new(r#"[<>"\s]"#).unwrap();
