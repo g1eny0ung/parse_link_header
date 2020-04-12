@@ -32,6 +32,10 @@
 //! The parsed value is a `Result<HashMap<Option<Rel>, Link>, ()>`, which `Rel` and `Link` is:
 //!
 //! ```rust
+//! use std::collections::HashMap;
+//!
+//! use http::Uri;
+//! 
 //! #[derive(Debug, PartialEq)]
 //! pub struct Link {
 //!     pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
