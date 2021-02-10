@@ -35,7 +35,7 @@
 //! use std::collections::HashMap;
 //!
 //! use http::Uri;
-//! 
+//!
 //! #[derive(Debug, PartialEq)]
 //! pub struct Link {
 //!     pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
@@ -88,6 +88,12 @@ pub fn parse(link_header: &str) -> Result<HashMap<Option<Rel>, Link>, ()> {
 
         let mut queries = HashMap::new();
         if let Some(query) = uri.query() {
+            let mut query = query.to_string();
+
+            if query.starts_with('&') {
+                query = query.chars().skip(1).collect();
+            }
+
             for q in query.split('&') {
                 let query_kv: Vec<&str> = q.split('=').collect();
 
@@ -200,5 +206,59 @@ mod tests {
     #[should_panic]
     fn parse_link_header_should_panic() {
         let _ = parse("<>");
+    }
+
+    #[test]
+    fn sentry_paginating_results() {
+        let link_header = "<https://sentry.io/api/0/projects/1/groups/?&cursor=1420837590:0:1>; rel=\"previous\"; results=\"false\", <https://sentry.io/api/0/projects/1/groups/?&cursor=1420837533:0:0>; rel=\"next\"; results=\"true\"";
+        let mut expected = HashMap::new();
+
+        expected.insert(
+            Some("previous".to_string()),
+            Link {
+                uri: "https://sentry.io/api/0/projects/1/groups/?&cursor=1420837590:0:1"
+                    .parse::<Uri>()
+                    .unwrap(),
+                raw_uri: "https://sentry.io/api/0/projects/1/groups/?&cursor=1420837590:0:1"
+                    .to_string(),
+                queries: [("cursor".to_string(), "1420837590:0:1".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                params: [
+                    ("rel".to_string(), "previous".to_string()),
+                    ("results".to_string(), "false".to_string()),
+                ]
+                .iter()
+                .cloned()
+                .collect(),
+            },
+        );
+
+        expected.insert(
+            Some("next".to_string()),
+            Link {
+                uri: "https://sentry.io/api/0/projects/1/groups/?&cursor=1420837533:0:0"
+                    .parse::<Uri>()
+                    .unwrap(),
+                raw_uri: "https://sentry.io/api/0/projects/1/groups/?&cursor=1420837533:0:0"
+                    .to_string(),
+                queries: [("cursor".to_string(), "1420837533:0:0".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                params: [
+                    ("rel".to_string(), "next".to_string()),
+                    ("results".to_string(), "true".to_string()),
+                ]
+                .iter()
+                .cloned()
+                .collect(),
+            },
+        );
+
+        let parsed = parse(link_header).unwrap();
+
+        assert_eq!(expected, parsed);
     }
 }
