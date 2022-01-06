@@ -30,12 +30,18 @@ parse_link_header = "0.2"
 Then:
 
 ```rust
-let link_header = "<https://api.github.com/repositories/41986369/contributors?page=2>; rel=\"next\", <https://api.github.com/repositories/41986369/contributors?page=14>; rel=\"last\"";
+let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
 
-parse_link_header::parse(link_header);
+let res = parse_link_header::parse(link_header);
+assert!(res.is_ok());
+
+let val = res.unwrap();
+assert_eq!(val.len(), 2);
+assert_eq!(val.get(&Some("next".to_string())).unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=2");
+assert_eq!(val.get(&Some("last".to_string())).unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 ```
 
-The parsed value is a `Result<HashMap<Option<Rel>, Link>, ()>`, which `Rel` and `Link` is:
+The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>`, which `Rel` and `Link` is:
 
 ```rust
 use std::collections::HashMap;
@@ -55,7 +61,7 @@ type Rel = String;
 
 You can see why the key of `HashMap` is `Option<Rel>` because if you won't provide a `rel` type, the key will be an empty string.
 
-Refer to <https://tools.ietf.org/html/rfc8288#section-3.3>, **the rel parameter MUST be present**.
+Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the rel parameter MUST be present**.
 
 Therefore, if you find that key is `None`, please check if you provide the `rel` type.
 

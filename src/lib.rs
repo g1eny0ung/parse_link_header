@@ -35,7 +35,7 @@
 //! assert_eq!(val.get(&Some("last".to_string())).unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 //! ```
 //!
-//! The parsed value is a `Result<HashMap<Option<Rel>, Link>, ()>`, which `Rel` and `Link` is:
+//! The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>`, which `Rel` and `Link` is:
 //!
 //! ```rust
 //! use std::collections::HashMap;
