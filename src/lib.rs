@@ -55,7 +55,7 @@
 //!
 //! You can see why the key of `HashMap` is `Option<Rel>` because if you won't provide a `rel` type, the key will be an empty string.
 //!
-//! Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **The rel parameter MUST be present**.
+//! Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the rel parameter MUST be present**.
 //!
 //! Therefore, if you find that key is `None`, please check if you provide the `rel` type.
 
