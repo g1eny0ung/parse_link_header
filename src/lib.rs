@@ -62,7 +62,6 @@
 use std::collections::HashMap;
 
 use http::Uri;
-use regex::Regex;
 use std::fmt;
 
 /// A `Result` alias where the `Err` case is [`parse_link_header::Error`].
@@ -71,11 +70,11 @@ use std::fmt;
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// An error encountered when attempting to parse a `Link:` HTTP header
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Error(ErrorKind);
 
 /// Enum to indicate the type of error encountered
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ErrorKind {
     /// Internal error of the type that should never happen
     InternalError,
@@ -95,11 +94,32 @@ impl fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+impl From<&Error> for Error {
+    /// Create a new Error object from a borrowed immutable reference.  This is required as part of
+    /// using `lazy_static!`, as that deals in references.
+    fn from(x: &Error) -> Self {
+        Error(x.0)
+    }
+}
+
+/// Struct to describe a single `Link:` header entry
+///
+/// This stores the raw URI found in the header, as well as parsed forms of that URI (including the
+/// queries) and any parameters associated with this URI.
 #[derive(Debug, PartialEq)]
 pub struct Link {
+    /// A parsed form of the URI
     pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
+
+    /// The raw text string of the URI
     pub raw_uri: String,
+
+    /// A `HashMap` of the query part of the URI (in the form of key=value)
     pub queries: HashMap<String, String>,
+
+    /// A `HashMap` of the parameters associated with this URI.  The most common is `rel`,
+    /// indicating the relationship between the current HTTP data being fetched and the URI in this
+    /// `Link:` header.
     pub params: HashMap<String, String>,
 }
 
@@ -115,11 +135,17 @@ pub type LinkMap = HashMap<Option<Rel>, Link>;
 /// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
 /// a `Result<LinkMap>` which represents the mapping between the relationship and the link entry.
 pub fn parse(link_header: &str) -> Result<LinkMap> {
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
+    lazy_static! {
+        static ref RE: Result<Regex> =
+            Regex::new(r#"[<>"\s]"#).or(Err(Error(ErrorKind::InternalError)));
+    }
     let mut result = HashMap::new();
 
     // remove all quotes, angle brackets, and whitespace
-    let re = Regex::new(r#"[<>"\s]"#).or(Err(Error(ErrorKind::InternalError)))?;
-    let preprocessed = re.replace_all(link_header, "");
+    let preprocessed = RE.as_ref()?.replace_all(link_header, "");
 
     // split along comma into different entries
     let splited = preprocessed.split(',');
@@ -322,5 +348,13 @@ mod tests {
             format!("{}", Error(ErrorKind::InvalidURI)),
             "unable to parse URI component"
         );
+    }
+
+    #[test]
+    fn test_error_from() {
+        let e1 = Error(ErrorKind::InternalError);
+        let e2 = Error::from(&e1);
+
+        assert_eq!(e1, e2);
     }
 }
