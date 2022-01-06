@@ -310,4 +310,17 @@ mod tests {
 
         assert_eq!(expected, parsed);
     }
+
+    #[test]
+    fn test_error_display() {
+        assert_eq!(
+            format!("{}", Error(ErrorKind::InternalError)),
+            "internal parser error"
+        );
+
+        assert_eq!(
+            format!("{}", Error(ErrorKind::InvalidURI)),
+            "unable to parse URI component"
+        );
+    }
 }
