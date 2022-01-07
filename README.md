@@ -1,6 +1,7 @@
 # parse_link_header
 
-[![Build Status](https://travis-ci.com/g1eny0ung/parse_link_header.svg?branch=master)](https://travis-ci.com/g1eny0ung/parse_link_header)
+[![Rust](https://github.com/g1eny0ung/parse_link_header/actions/workflows/rust.yml/badge.svg)](https://github.com/g1eny0ung/parse_link_header/actions/workflows/rust.yml)
+[![codecov](https://codecov.io/gh/g1eny0ung/parse_link_header/branch/master/graph/badge.svg?token=ZEDQWONIIZ)](https://codecov.io/gh/g1eny0ung/parse_link_header)
 ![Crates.io](https://img.shields.io/crates/v/parse_link_header)
 ![Crates.io](https://img.shields.io/crates/l/parse_link_header)
 
