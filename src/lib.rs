@@ -505,4 +505,12 @@ mod tests {
 
         assert_eq!(e1, e2);
     }
+
+    #[test]
+    fn test_error_from() {
+        let e1 = Error(ErrorKind::InternalError);
+        let e2 = Error::from(&e1);
+
+        assert_eq!(e1, e2);
+    }
 }
