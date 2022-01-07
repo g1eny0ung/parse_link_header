@@ -96,6 +96,12 @@ pub enum ErrorKind {
 
     /// Failure to parse link value into URI
     InvalidURI,
+
+    /// Malformed parameters
+    MalformedParam,
+
+    /// Malformed URI query
+    MalformedQuery,
 }
 
 impl fmt::Display for Error {
@@ -103,6 +109,8 @@ impl fmt::Display for Error {
         match self.0 {
             ErrorKind::InternalError => write!(f, "internal parser error"),
             ErrorKind::InvalidURI => write!(f, "unable to parse URI component"),
+            ErrorKind::MalformedParam => write!(f, "malformed parameter list"),
+            ErrorKind::MalformedQuery => write!(f, "malformed URI query"),
         }
     }
 }
@@ -181,34 +189,32 @@ pub fn parse(link_header: &str) -> Result<LinkMap> {
         if let Some(query) = uri.query() {
             let mut query = query.to_string();
 
+            // skip leading ampersand
             if query.starts_with('&') {
                 query = query.chars().skip(1).collect();
             }
 
+            // split each query and extract as (key, value) pairs
             for q in query.split('&') {
-                let query_kv: Vec<&str> = q.split('=').collect();
+                let (key, val) = q.split_once('=').ok_or(Error(ErrorKind::MalformedQuery))?;
 
-                queries.insert(query_kv[0].to_string(), query_kv[1].to_string());
+                queries.insert(key.to_string(), val.to_string());
             }
         }
 
         let mut params = HashMap::new();
-        let mut rel = None;
 
+        // extract the parameter list as (key, value) pairs
         for param in link_vec {
-            let param_kv: Vec<&str> = param.split('=').collect();
-            let key = param_kv[0];
-            let val = param_kv[1];
-
-            if key == "rel" {
-                rel = Some(val.to_string());
-            }
+            let (key, val) = param
+                .split_once('=')
+                .ok_or(Error(ErrorKind::MalformedParam))?;
 
             params.insert(key.to_string(), val.to_string());
         }
 
         result.insert(
-            rel,
+            params.get("rel").cloned(),
             Link {
                 uri,
                 raw_uri,
@@ -365,6 +371,16 @@ mod tests {
         assert_eq!(
             format!("{}", Error(ErrorKind::InvalidURI)),
             "unable to parse URI component"
+        );
+
+        assert_eq!(
+            format!("{}", Error(ErrorKind::MalformedParam)),
+            "malformed parameter list"
+        );
+
+        assert_eq!(
+            format!("{}", Error(ErrorKind::MalformedQuery)),
+            "malformed URI query"
         );
     }
 
