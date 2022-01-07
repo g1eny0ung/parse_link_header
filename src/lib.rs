@@ -35,7 +35,8 @@
 //! assert_eq!(val.get(&Some("last".to_string())).unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 //! ```
 //!
-//! The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>`, which `Rel` and `Link` is:
+//! The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>` (aka a
+//! [`LinkMap`](type.LinkMap.html)), which `Rel` and `Link` is:
 //!
 //! ```rust
 //! use std::collections::HashMap;
@@ -58,6 +59,21 @@
 //! Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the rel parameter MUST be present**.
 //!
 //! Therefore, if you find that key is `None`, please check if you provide the `rel` type.
+//!
+//! Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a
+//! [`RelLinkMap`](type.RelLinkMap.html)), as in:
+//!
+//! ```rust
+//! let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
+//!
+//! let res = parse_link_header::parse_with_rel(link_header);
+//! assert!(res.is_ok());
+//!
+//! let val = res.unwrap();
+//! assert_eq!(val.len(), 2);
+//! assert_eq!(val.get("next").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=2");
+//! assert_eq!(val.get("last").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
+//! ```
 //!
 //! # Feature: `url`
 //!
@@ -102,6 +118,9 @@ pub enum ErrorKind {
 
     /// Malformed URI query
     MalformedQuery,
+
+    /// Missing `rel` parameter when required
+    MissingRel,
 }
 
 impl fmt::Display for Error {
@@ -111,6 +130,7 @@ impl fmt::Display for Error {
             ErrorKind::InvalidURI => write!(f, "unable to parse URI component"),
             ErrorKind::MalformedParam => write!(f, "malformed parameter list"),
             ErrorKind::MalformedQuery => write!(f, "malformed URI query"),
+            ErrorKind::MissingRel => write!(f, "missing 'rel' parameter"),
         }
     }
 }
@@ -148,12 +168,32 @@ pub struct Link {
 
 type Rel = String;
 
-/// Type alias for the parsed data returned as a `HashMap`
+/// Type alias for the parsed data returned as a `HashMap` with a key of `Option<Rel>`.
+///
+/// This is different from [`RelLinkMap`](type.RelLinkMap.html) which has a key of `Rel`.
 pub type LinkMap = HashMap<Option<Rel>, Link>;
 
-/// Parse link header into a [`LinkMap`].
+/// Type alias for the parsed data returned as a `HashMap` where the `rel` parameter is required to
+/// be present.
 ///
-/// [`LinkMap`]: type.LinkMap.html
+/// This is different from the [`LinkMap`](type.LinkMap.html) which has a key of `Option<Rel>`
+pub type RelLinkMap = HashMap<Rel, Link>;
+
+/// Parse link header into a [`RelLinkMap`](type.RelLinkMap.html).
+///
+/// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
+/// a `Result<RelLinkMap>` which represents the mapping between the relationship and the link entry.
+pub fn parse_with_rel(link_header: &str) -> Result<RelLinkMap> {
+    let mut result = HashMap::new();
+
+    for (k, v) in parse(link_header)? {
+        result.insert(k.ok_or(Error(ErrorKind::MissingRel))?, v);
+    }
+
+    Ok(result)
+}
+
+/// Parse link header into a [`LinkMap`](type.LinkMap.html).
 ///
 /// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
 /// a `Result<LinkMap>` which represents the mapping between the relationship and the link entry.
@@ -303,6 +343,75 @@ mod tests {
     }
 
     #[test]
+    fn parse_with_rel_works() {
+        let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
+        let mut expected = HashMap::new();
+
+        expected.insert(
+            "next".to_string(),
+            Link {
+                uri: "https://api.github.com/repositories/41986369/contributors?page=2"
+                    .parse()
+                    .unwrap(),
+                raw_uri: "https://api.github.com/repositories/41986369/contributors?page=2"
+                    .to_string(),
+                queries: [("page".to_string(), "2".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                params: [("rel".to_string(), "next".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+            },
+        );
+        expected.insert(
+            "last".to_string(),
+            Link {
+                uri: "https://api.github.com/repositories/41986369/contributors?page=14"
+                    .parse()
+                    .unwrap(),
+                raw_uri: "https://api.github.com/repositories/41986369/contributors?page=14"
+                    .to_string(),
+                queries: [("page".to_string(), "14".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                params: [("rel".to_string(), "last".to_string())]
+                    .iter()
+                    .cloned()
+                    .collect(),
+            },
+        );
+
+        let parsed = parse_with_rel(link_header).unwrap();
+
+        assert_eq!(expected, parsed);
+
+        #[cfg(not(feature = "url"))]
+        {
+            let mut rel_link_expected = HashMap::new();
+
+            rel_link_expected.insert(
+                "foo/bar".to_string(),
+                Link {
+                    uri: "/foo/bar".parse().unwrap(),
+                    raw_uri: "/foo/bar".to_string(),
+                    queries: HashMap::new(),
+                    params: [("rel".to_string(), "foo/bar".to_string())]
+                        .iter()
+                        .cloned()
+                        .collect(),
+                },
+            );
+
+            let rel_link_parsed = parse_with_rel(r#"</foo/bar>; rel="foo/bar""#).unwrap();
+
+            assert_eq!(rel_link_expected, rel_link_parsed);
+        }
+    }
+
+    #[test]
     fn parse_link_header_should_err() {
         assert_eq!(parse("<>"), Err(Error(ErrorKind::InvalidURI)));
     }
@@ -381,6 +490,11 @@ mod tests {
         assert_eq!(
             format!("{}", Error(ErrorKind::MalformedQuery)),
             "malformed URI query"
+        );
+
+        assert_eq!(
+            format!("{}", Error(ErrorKind::MissingRel)),
+            "missing 'rel' parameter"
         );
     }
 
