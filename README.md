@@ -65,6 +65,17 @@ Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the
 
 Therefore, if you find that key is `None`, please check if you provide the `rel` type.
 
+# Feature: `url`
+
+If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
+of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
+`http::Uri` it normally is.  This allows direct use of the `uri` field with other popular
+crates that use `url`, such as [`reqwest`](https://crates.io/crates/reqwest).
+
+**NOTE:** This implictly disabled support for relative refs, as URLs do not support relative
+refs (whereas URIs do).
+
+
 ## How to contribute
 
 Pull a request or open an issue to describe your changes or problems.
