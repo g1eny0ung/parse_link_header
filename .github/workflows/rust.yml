@@ -41,7 +41,7 @@ jobs:
 
       - name: cargo tarpaulin --out Xml
         run: |
-          cargo install cargo-tarpaulin
+          cargo install cargo-tarpaulin || true
           cargo tarpaulin --out Xml
 
       - uses: codecov/codecov-action@v2
