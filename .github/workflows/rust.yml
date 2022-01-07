@@ -21,7 +21,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml') }}
+
       - name: Build
         run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
+
+      - name: cargo tarpaulin --out Xml
+        run: |
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out Xml
+
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+          dry_run: true
