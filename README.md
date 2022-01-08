@@ -7,6 +7,17 @@
 
 A library for parse http link header.
 
+<!-- toc -->
+
+- [How to use](#how-to-use)
+  - [Note for version 0.1.x](#note-for-version-01x)
+  - [Version 0.2.x](#version-02x)
+- [Feature: `url`](#feature-url)
+- [How to contribute](#how-to-contribute)
+- [License](#license)
+
+<!-- tocstop -->
+
 ## How to use
 
 ### Note for version 0.1.x
@@ -66,16 +77,15 @@ Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the
 
 Therefore, if you find that key is `None`, please check if you provide the `rel` type.
 
-# Feature: `url`
+## Feature: `url`
 
 If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
 of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
-`http::Uri` it normally is.  This allows direct use of the `uri` field with other popular
+`http::Uri` it normally is. This allows direct use of the `uri` field with other popular
 crates that use `url`, such as [`reqwest`](https://crates.io/crates/reqwest).
 
 **NOTE:** This implictly disabled support for relative refs, as URLs do not support relative
 refs (whereas URIs do).
-
 
 ## How to contribute
 

@@ -59,7 +59,7 @@
 //!
 //! Therefore, if you find that key is `None`, please check if you provide the `rel` type.
 //!
-//! # Feature: `url`
+//! ## Feature: `url`
 //!
 //! If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
 //! of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
