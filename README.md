@@ -31,8 +31,7 @@ same structure.
 
 **So if you want to parse `relative ref`, please use version `0.2`.**
 
-**Or if you don't care about `relative ref` and wanna simple `HashMap<String,
-HashMap<String, String>>` result, you can use version `0.1`.**
+**Or if you don't care about `relative ref` and wanna simple `HashMap<String, HashMap<String, String>>` result, you can use version `0.1`.**
 
 ### Version 0.2.x
 
@@ -85,8 +84,7 @@ Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017),
 Therefore, if you find that key is `None`, please check if you provide the
 `rel` type.
 
-Alternatively, use the `parse_with_rel()` function to get a `HashMap<String,
-Link>` (aka a [`RelLinkMap`](type.RelLinkMap.html)), as in:
+Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a [`RelLinkMap`](type.RelLinkMap.html)), as in:
 
 ```rust
 let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
@@ -99,18 +97,6 @@ assert_eq!(val.len(), 2);
 assert_eq!(val.get("next").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=2");
 assert_eq!(val.get("last").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 ```
-
-# Feature: `url`
-
-If you enable the `url` feature, the `uri` field of struct
-[`Link`](struct.Link.html) will be of type url::Url from the [url
-crate](https://crates.io/crates/url), rather than the `http::Uri` it normally
-is.  This allows direct use of the `uri` field with other popular crates that
-use `url`, such as [`reqwest`](https://crates.io/crates/reqwest).
-
-**NOTE:** This implictly disabled support for relative refs, as URLs do not
-support relative refs (whereas URIs do).
-
 
 ## Feature: `url`
 
