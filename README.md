@@ -11,7 +11,8 @@ A library for parse http link header.
 
 - [How to use](#how-to-use)
   - [Note for version 0.1.x](#note-for-version-01x)
-  - [Version 0.2.x](#version-02x)
+  - [Example](#example)
+- [parse_with_rel](#parse_with_rel)
 - [Feature: `url`](#feature-url)
 - [How to contribute](#how-to-contribute)
 - [License](#license)
@@ -33,13 +34,13 @@ same structure.
 
 **Or if you don't care about `relative ref` and wanna simple `HashMap<String, HashMap<String, String>>` result, you can use version `0.1`.**
 
-### Version 0.2.x
+### Example
 
 In your `Cargo.toml`, add:
 
 ```toml
 [dependencies]
-parse_link_header = "0.2"
+parse_link_header = "0.3"
 ```
 
 Then:
@@ -84,6 +85,10 @@ Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017),
 Therefore, if you find that key is `None`, please check if you provide the
 `rel` type.
 
+## parse_with_rel
+
+> Version >= 0.3.0
+
 Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a [`RelLinkMap`](type.RelLinkMap.html)), as in:
 
 ```rust
@@ -99,6 +104,8 @@ assert_eq!(val.get("last").unwrap().raw_uri, "https://api.github.com/repositorie
 ```
 
 ## Feature: `url`
+
+> Version >= 0.3.0
 
 If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
 of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
