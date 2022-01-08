@@ -75,7 +75,7 @@
 //! assert_eq!(val.get("last").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 //! ```
 //!
-//! # Feature: `url`
+//! ## Feature: `url`
 //!
 //! If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
 //! of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
