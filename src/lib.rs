@@ -58,10 +58,25 @@
 //! Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017), **the rel parameter MUST be present**.
 //!
 //! Therefore, if you find that key is `None`, please check if you provide the `rel` type.
+//!
+//! # Feature: `url`
+//!
+//! If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
+//! of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
+//! `http::Uri` it normally is.  This allows direct use of the `uri` field with other popular
+//! crates that use `url`, such as [`reqwest`](https://crates.io/crates/reqwest).
+//!
+//! **NOTE:** This implictly disabled support for relative refs, as URLs do not support relative
+//! refs (whereas URIs do).
 
 use std::collections::HashMap;
 
+#[cfg(not(feature = "url"))]
 use http::Uri;
+
+#[cfg(feature = "url")]
+use url::Url as Uri;
+
 use std::fmt;
 
 /// A `Result` alias where the `Err` case is [`parse_link_header::Error`].
@@ -264,24 +279,27 @@ mod tests {
 
         assert_eq!(expected, parsed);
 
-        let mut rel_link_expected = HashMap::new();
+        #[cfg(not(feature = "url"))]
+        {
+            let mut rel_link_expected = HashMap::new();
 
-        rel_link_expected.insert(
-            Some("foo/bar".to_string()),
-            Link {
-                uri: "/foo/bar".parse().unwrap(),
-                raw_uri: "/foo/bar".to_string(),
-                queries: HashMap::new(),
-                params: [("rel".to_string(), "foo/bar".to_string())]
-                    .iter()
-                    .cloned()
-                    .collect(),
-            },
-        );
+            rel_link_expected.insert(
+                Some("foo/bar".to_string()),
+                Link {
+                    uri: "/foo/bar".parse().unwrap(),
+                    raw_uri: "/foo/bar".to_string(),
+                    queries: HashMap::new(),
+                    params: [("rel".to_string(), "foo/bar".to_string())]
+                        .iter()
+                        .cloned()
+                        .collect(),
+                },
+            );
 
-        let rel_link_parsed = parse("</foo/bar>; rel=\"foo/bar\"").unwrap();
+            let rel_link_parsed = parse(r#"</foo/bar>; rel="foo/bar""#).unwrap();
 
-        assert_eq!(rel_link_expected, rel_link_parsed);
+            assert_eq!(rel_link_expected, rel_link_parsed);
+        }
     }
 
     #[test]
