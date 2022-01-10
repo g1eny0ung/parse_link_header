@@ -34,7 +34,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --verbose -- -D warnings
 
-  build and test:
+  build_and_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
