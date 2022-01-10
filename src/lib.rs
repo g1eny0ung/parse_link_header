@@ -428,10 +428,9 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(feature = "url"))]
     fn parse_with_rel_should_err() {
         assert_eq!(
-            parse_with_rel(r#"</foo/bar>; type="foo/bar""#),
+            parse_with_rel(r#"<http://local.host/foo/bar>; type="foo/bar""#),
             Err(Error(ErrorKind::MissingRel))
         );
     }
