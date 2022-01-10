@@ -197,7 +197,7 @@ pub fn parse_with_rel(link_header: &str) -> Result<RelLinkMap> {
 /// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
 /// a `Result<LinkMap>` which represents the mapping between the relationship and the link entry.
 pub fn parse(link_header: &str) -> Result<LinkMap> {
-    parse_with(link_header, |x| Ok(x))
+    parse_with(link_header, Ok)
 }
 
 /// Generic parser function
