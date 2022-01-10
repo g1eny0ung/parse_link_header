@@ -190,13 +190,7 @@ pub type RelLinkMap = HashMap<Rel, Link>;
 /// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
 /// a `Result<RelLinkMap>` which represents the mapping between the relationship and the link entry.
 pub fn parse_with_rel(link_header: &str) -> Result<RelLinkMap> {
-    let mut result = HashMap::new();
-
-    for (k, v) in parse(link_header)? {
-        result.insert(k.ok_or(Error(ErrorKind::MissingRel))?, v);
-    }
-
-    Ok(result)
+    parse_with(link_header, |x| x.ok_or(Error(ErrorKind::MissingRel)))
 }
 
 /// Parse link header into a [`LinkMap`](type.LinkMap.html).
@@ -204,6 +198,18 @@ pub fn parse_with_rel(link_header: &str) -> Result<RelLinkMap> {
 /// Takes a `&str` which is the value of the HTTP `Link:` header, attempts to parse it, and returns
 /// a `Result<LinkMap>` which represents the mapping between the relationship and the link entry.
 pub fn parse(link_header: &str) -> Result<LinkMap> {
+    parse_with(link_header, |x| Ok(x))
+}
+
+/// Generic parser function
+///
+/// Does the actual parsing work, and then uses make_key() to proceses the HashMap key into the
+/// desired type.
+fn parse_with<K, F>(link_header: &str, make_key: F) -> Result<HashMap<K, Link>>
+where
+    K: Eq + std::hash::Hash,
+    F: Fn(Option<String>) -> Result<K>,
+{
     use lazy_static::lazy_static;
     use regex::Regex;
 
@@ -260,7 +266,7 @@ pub fn parse(link_header: &str) -> Result<LinkMap> {
         }
 
         result.insert(
-            params.get("rel").cloned(),
+            make_key(params.get("rel").cloned())?,
             Link {
                 uri,
                 raw_uri,
@@ -420,6 +426,14 @@ mod tests {
     #[test]
     fn parse_link_header_should_err() {
         assert_eq!(parse("<>"), Err(Error(ErrorKind::InvalidURI)));
+    }
+
+    #[test]
+    fn parse_with_rel_should_err() {
+        assert_eq!(
+            parse_with_rel(r#"</foo/bar>; type="foo/bar""#),
+            Err(Error(ErrorKind::MissingRel))
+        );
     }
 
     #[test]
