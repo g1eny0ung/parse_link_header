@@ -1,3 +1,11 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        # allow the coverage to drop by 5%, and still posting a success status
+        threshold: 5%
+
 comment: # this is a top-level key
   layout: "reach, diff, flags, files"
   behavior: default
