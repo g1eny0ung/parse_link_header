@@ -92,14 +92,13 @@
 //! refs (whereas URIs do).
 
 use std::collections::HashMap;
+use std::fmt;
 
 #[cfg(not(feature = "url"))]
 use http::Uri;
 
 #[cfg(feature = "url")]
 use url::Url as Uri;
-
-use std::fmt;
 
 /// A `Result` alias where the `Err` case is [`parse_link_header::Error`].
 ///
@@ -429,6 +428,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(feature = "url"))]
     fn parse_with_rel_should_err() {
         assert_eq!(
             parse_with_rel(r#"</foo/bar>; type="foo/bar""#),
