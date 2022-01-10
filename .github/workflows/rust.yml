@@ -87,10 +87,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - name: cargo tarpaulin --out Xml
-        run: |
-          cargo install cargo-tarpaulin || true
-          cargo tarpaulin --all-features --out Xml
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
       - uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true # optional (default = false)
