@@ -226,7 +226,7 @@ where
 
     for s in splited {
         // split each entry into parts
-        let mut link_vec: Vec<&str> = s.split(';').collect();
+        let mut link_vec: Vec<_> = s.split(';').collect();
         link_vec.reverse();
 
         // pop off the link value; the split() guarantees at least one entry to pop()
