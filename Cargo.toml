@@ -1,6 +1,6 @@
 [package]
 name = "parse_link_header"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["Yue Yang <g1enyy0ung@gmail.com>"]
 edition = "2018"
 description = "A library for parse http link header."
