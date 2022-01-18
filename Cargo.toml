@@ -1,9 +1,12 @@
 [package]
 name = "parse_link_header"
 version = "0.3.2"
-authors = ["Yue Yang <g1enyy0ung@gmail.com>"]
+authors = [
+  "Yue Yang <g1enyy0ung@gmail.com>",
+  "Matthew Dharm"
+]
 edition = "2018"
-description = "A library for parse http link header."
+description = "A library for parsing HTTP Link header."
 categories = ["parsing", "web-programming"]
 documentation = "https://docs.rs/parse_link_header"
 homepage = "https://github.com/g1eny0ung/parse_link_header"

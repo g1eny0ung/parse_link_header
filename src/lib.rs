@@ -1,4 +1,4 @@
-//! A library for parse http link header.
+//! A library for parsing HTTP Link header.
 //!
 //! # How to use
 //!

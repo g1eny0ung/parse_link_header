@@ -5,7 +5,7 @@
 ![Crates.io](https://img.shields.io/crates/v/parse_link_header)
 ![Crates.io](https://img.shields.io/crates/l/parse_link_header)
 
-A library for parse http link header.
+A library for parsing HTTP Link header.
 
 <!-- toc -->
 
