@@ -8,7 +8,7 @@
 //!
 //! The parsed value of version 0.1 refers to the return value of <https://github.com/thlorenz/parse-link-header>, which is a `HashMap` with the same structure.
 //!
-//! **So if you want to parse `relative ref`, please use version `0.2`.**
+//! **So if you want to parse `relative ref`, please use version `>=0.2`.**
 //!
 //! **Or if you don't care about `relative ref` and wanna simple `HashMap<String, HashMap<String, String>>` result, you can use version `0.1`.**
 //!
@@ -64,8 +64,7 @@
 //!
 //! > Version >= 0.3.0
 //!
-//! Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a
-//! [`RelLinkMap`](type.RelLinkMap.html)), as in:
+//! Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a [`RelLinkMap`](https://docs.rs/parse_link_header/latest/parse_link_header/type.RelLinkMap.html)), as in:
 //!
 //! ```rust
 //! let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
@@ -79,17 +78,17 @@
 //! assert_eq!(val.get("last").unwrap().raw_uri, "https://api.github.com/repositories/41986369/contributors?page=14");
 //! ```
 //!
+//! You can use this function if you ensure that the `rel` parameter is present in the header.
+//!
 //! ## Feature: `url`
 //!
 //! > Version >= 0.3.0
 //!
-//! If you enable the `url` feature, the `uri` field of struct [`Link`](struct.Link.html) will be
-//! of type url::Url from the [url crate](https://crates.io/crates/url), rather than the
-//! `http::Uri` it normally is.  This allows direct use of the `uri` field with other popular
-//! crates that use `url`, such as [`reqwest`](https://crates.io/crates/reqwest).
+//! If the `url` feature is enabled, the `uri` field in struct [`parse_link_header::Link`](https://docs.rs/parse_link_header/latest/parse_link_header/struct.Link.html) will be
+//! of type `url::Url` from the [url crate](https://crates.io/crates/url), rather than the `http::uri::Uri` it normally is.
+//! This allows integration with other libraries that use the url crate, such as [reqwest](https://crates.io/crates/reqwest).
 //!
-//! **NOTE:** This implictly disabled support for relative refs, as URLs do not support relative
-//! refs (whereas URIs do).
+//! **NOTE:** This implicitly disabled support for relative refs, as URLs do not support relative refs (whereas URIs do).
 
 use std::collections::HashMap;
 use std::fmt;
