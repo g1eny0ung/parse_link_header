@@ -64,7 +64,7 @@
 //!
 //! > Version >= 0.3.0
 //!
-//! Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a [`RelLinkMap`](https://docs.rs/parse_link_header/latest/parse_link_header/type.RelLinkMap.html)), as in:
+//! Alternatively, use the `parse_with_rel()` function to get a `HashMap<String, Link>` (aka a [`RelLinkMap`](type.RelLinkMap.html)), as in:
 //!
 //! ```rust
 //! let link_header = r#"<https://api.github.com/repositories/41986369/contributors?page=2>; rel="next", <https://api.github.com/repositories/41986369/contributors?page=14>; rel="last""#;
@@ -84,7 +84,7 @@
 //!
 //! > Version >= 0.3.0
 //!
-//! If the `url` feature is enabled, the `uri` field in struct [`parse_link_header::Link`](https://docs.rs/parse_link_header/latest/parse_link_header/struct.Link.html) will be
+//! If the `url` feature is enabled, the `uri` field in struct [`parse_link_header::Link`](struct.Link.html) will be
 //! of type `url::Url` from the [url crate](https://crates.io/crates/url), rather than the `http::uri::Uri` it normally is.
 //! This allows integration with other libraries that use the url crate, such as [reqwest](https://crates.io/crates/reqwest).
 //!
@@ -104,11 +104,11 @@ use url::Url as Uri;
 /// [`parse_link_header::Error`]: struct.Error.html
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// An error encountered when attempting to parse a `Link:` HTTP header
+/// An error encountered when attempting to parse a `Link:` HTTP header.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Error(ErrorKind);
 
-/// Enum to indicate the type of error encountered
+/// Enum to indicate the type of error encountered.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ErrorKind {
     /// Internal error of the type that should never happen
@@ -142,14 +142,14 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {}
 
 impl From<&Error> for Error {
-    /// Create a new Error object from a borrowed immutable reference.  This is required as part of
+    /// Create a new Error object from a borrowed immutable reference. This is required as part of
     /// using `lazy_static!`, as that deals in references.
     fn from(x: &Error) -> Self {
         Error(x.0)
     }
 }
 
-/// Struct to describe a single `Link:` header entry
+/// Struct to describe a single `Link:` header entry.
 ///
 /// This stores the raw URI found in the header, as well as parsed forms of that URI (including the
 /// queries) and any parameters associated with this URI.
@@ -164,7 +164,7 @@ pub struct Link {
     /// A `HashMap` of the query part of the URI (in the form of key=value)
     pub queries: HashMap<String, String>,
 
-    /// A `HashMap` of the parameters associated with this URI.  The most common is `rel`,
+    /// A `HashMap` of the parameters associated with this URI. The most common is `rel`,
     /// indicating the relationship between the current HTTP data being fetched and the URI in this
     /// `Link:` header.
     pub params: HashMap<String, String>,
@@ -180,7 +180,7 @@ pub type LinkMap = HashMap<Option<Rel>, Link>;
 /// Type alias for the parsed data returned as a `HashMap` where the `rel` parameter is required to
 /// be present.
 ///
-/// This is different from the [`LinkMap`](type.LinkMap.html) which has a key of `Option<Rel>`
+/// This is different from the [`LinkMap`](type.LinkMap.html) which has a key of `Option<Rel>`.
 pub type RelLinkMap = HashMap<Rel, Link>;
 
 /// Parse link header into a [`RelLinkMap`](type.RelLinkMap.html).
@@ -199,7 +199,7 @@ pub fn parse(link_header: &str) -> Result<LinkMap> {
     parse_with(link_header, Ok)
 }
 
-/// Generic parser function
+/// Generic parser function.
 ///
 /// Does the actual parsing work, and then uses make_key() to proceses the HashMap key into the
 /// desired type.
