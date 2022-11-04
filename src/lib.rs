@@ -90,6 +90,7 @@
 //!
 //! **NOTE:** This implicitly disabled support for relative refs, as URLs do not support relative refs (whereas URIs do).
 
+#![allow(clippy::derive_partial_eq_without_eq)]
 use std::collections::HashMap;
 use std::fmt;
 
