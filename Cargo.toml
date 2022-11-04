@@ -1,6 +1,6 @@
 [package]
 name = "parse_link_header"
-version = "0.3.2"
+version = "0.3.3"
 authors = [
   "Yue Yang <g1enyy0ung@gmail.com>",
   "Matthew Dharm"
