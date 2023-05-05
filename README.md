@@ -58,7 +58,7 @@ assert_eq!(val.get(&Some("last".to_string())).unwrap().raw_uri, "https://api.git
 ```
 
 The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>` (aka a
-`LinkMap`, which `Rel` and `Link` is:
+[`LinkMap`](https://docs.rs/parse_link_header/latest/parse_link_header/type.LinkMap.html)), which `Rel` and `Link` is:
 
 ```rust
 use std::collections::HashMap;
