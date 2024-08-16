@@ -45,7 +45,7 @@ jobs:
       - run: cargo build --verbose
       - run: cargo test --all-features --verbose
       - run: |
-          cargo install cargo-tarpaulin
+          cargo install cargo-tarpaulin || true
           cargo tarpaulin --out xml
       - uses: codecov/codecov-action@v4
         with:
