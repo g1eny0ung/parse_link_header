@@ -18,28 +18,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  clippy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --verbose -- -D warnings
-
-  build_and_test:
+  rust:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,49 +26,27 @@ jobs:
           - stable
           - nightly
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
-      - name: Build
-        uses: actions-rs/cargo@v1
+          components: clippy
+      - run: cargo clippy -- -D warnings
+      - run: cargo build --verbose
+      - run: cargo test --all-features --verbose
+      - run: |
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out xml
+      - uses: codecov/codecov-action@v4
         with:
-          command: build
-          args: --verbose
-      - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features --verbose
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-      - uses: codecov/codecov-action@v2
-        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
