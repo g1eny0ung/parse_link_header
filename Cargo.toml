@@ -1,6 +1,6 @@
 [package]
 name = "parse_link_header"
-version = "0.3.3"
+version = "0.4.0"
 authors = [
   "Yue Yang <g1enyy0ung@gmail.com>",
   "Matthew Dharm"
@@ -18,4 +18,4 @@ license = "MIT"
 http = "1"
 regex = "1"
 lazy_static = "1.4.0"
-url = {version = "2.2.2", optional = true }
+url = { version = "2.2.2", optional = true }

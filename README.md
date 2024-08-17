@@ -40,7 +40,7 @@ In your `Cargo.toml`, add:
 
 ```toml
 [dependencies]
-parse_link_header = "0.3"
+parse_link_header = "0.4"
 ```
 
 Then:
@@ -67,7 +67,7 @@ use http::Uri;
 
 #[derive(Debug, PartialEq)]
 pub struct Link {
-    pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
+    pub uri: Uri, // https://docs.rs/http/1.1.0/http/uri/struct.Uri.html
     pub raw_uri: String,
     pub queries: HashMap<String, String>,
     pub params: HashMap<String, String>,

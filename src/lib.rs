@@ -1,6 +1,6 @@
 //! A library for parsing HTTP Link header.
 //!
-//! # How to use
+//! ## How to use
 //!
 //! ### Note for version 0.1.x
 //!
@@ -18,7 +18,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! parse_link_header = "0.3"
+//! parse_link_header = "0.4"
 //! ```
 //!
 //! Then:
@@ -45,7 +45,7 @@
 //!
 //! #[derive(Debug, PartialEq)]
 //! pub struct Link {
-//!     pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
+//!     pub uri: Uri, // https://docs.rs/http/1.1.0/http/uri/struct.Uri.html
 //!     pub raw_uri: String,
 //!     pub queries: HashMap<String, String>,
 //!     pub params: HashMap<String, String>,
@@ -157,7 +157,7 @@ impl From<&Error> for Error {
 #[derive(Debug, PartialEq)]
 pub struct Link {
     /// A parsed form of the URI
-    pub uri: Uri, // https://docs.rs/http/0.2.1/http/uri/struct.Uri.html
+    pub uri: Uri, // https://docs.rs/http/1.1.0/http/uri/struct.Uri.html
 
     /// The raw text string of the URI
     pub raw_uri: String,
