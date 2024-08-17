@@ -32,7 +32,7 @@ same structure.
 
 **So if you want to parse `relative ref`, please use version `>=0.2`.**
 
-**Or if you don't care about `relative ref` and wanna simple `HashMap<String, HashMap<String, String>>` result, you can use version `0.1`.**
+**Or if you don't care about `relative ref` and want a simple `HashMap<String, HashMap<String, String>>` result, you can use version `0.1`.**
 
 ### Example
 
@@ -63,11 +63,15 @@ The parsed value is a `Result<HashMap<Option<Rel>, Link>, Error>` (aka a
 ```rust
 use std::collections::HashMap;
 
+#[cfg(not(feature = "url"))]
 use http::Uri;
+
+#[cfg(feature = "url")]
+use url::Url as Uri;
 
 #[derive(Debug, PartialEq)]
 pub struct Link {
-    pub uri: Uri, // https://docs.rs/http/1.1.0/http/uri/struct.Uri.html
+    pub uri: Uri,
     pub raw_uri: String,
     pub queries: HashMap<String, String>,
     pub params: HashMap<String, String>,
@@ -76,14 +80,9 @@ pub struct Link {
 type Rel = String;
 ```
 
-You can see why the key of `HashMap` is `Option<Rel>` because if you won't
-provide a `rel` type, the key will be an empty string.
-
-Refer to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017),
-**the rel parameter MUST be present**.
-
-Therefore, if you find that key is `None`, please check if you provide the
-`rel` type.
+Note that according to <https://tools.ietf.org/html/rfc8288#section-3.3> (October 2017),
+**the rel parameter must be present**. That's why the key of `HashMap<Option<Rel>, Link>` is `Option<Rel>`.
+So if you find that the key is `None`, check if you specified the `rel` type.
 
 ## parse_with_rel
 
