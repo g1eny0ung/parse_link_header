@@ -239,14 +239,11 @@ where
         let uri: Uri = raw_uri.parse().or(Err(Error(ErrorKind::InvalidURI)))?;
 
         let mut queries = HashMap::new();
-        if let Some(query) = uri.query() {
-            let mut query = query.to_string();
-
+        if let Some(query) = uri
+            .query()
             // skip leading ampersand
-            if query.starts_with('&') {
-                query = query.chars().skip(1).collect();
-            }
-
+            .map(|query| query.trim_start_matches('&'))
+        {
             // split each query and extract as (key, value) pairs
             for q in query.split('&') {
                 let (key, val) = q.split_once('=').ok_or(Error(ErrorKind::MalformedQuery))?;
